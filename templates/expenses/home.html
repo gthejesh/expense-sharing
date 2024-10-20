@@ -1,0 +1,407 @@
+{% extends 'expenses/ui.html' %}
+{% block title %}
+Dashboard
+{% endblock %}
+{% block content %}
+{% include 'inc/navbar.html' %}
+
+<div class="container" style="margin-top: 100px;">
+    <div class="row">
+        <div class="col-md-6 pe-5">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2>Expenses</h2>
+                <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#NewExpense">+ Add
+                    Expense</button>
+            </div>
+            {% if myparticipations %}
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Share</th>
+                        <th>Date</th>
+                        <th>Created by</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for mp in myparticipations %}
+                    <tr>
+                        <td>{{ mp.expense.title }}</td>
+                        <td>{{ mp.amount_owed  }}/{{ mp.expense.total_amount }}</td>
+                        <td>{{ mp.expense.created_at|date:"d-m-Y" }}</td>
+                        {% if  mp.expense.created_by.id == request.session.user_id %}
+                        <td>me</td>
+                        {% else %}
+                        <td>{{ mp.expense.created_by.name }}</td>
+                        {% endif %}
+                        <td><a href="{% url 'home_exp_details' mp.expense.id %}">View</a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p>No expenses found. Add your first expense by clicking +Add Expense button.</p>
+            {% endif %}
+        </div>
+        <div class="col-md-6 border-start ps-5">
+            <h1>Expense Details</h1>
+            {% if participations %}
+            <h2>{{ expense.title }}</h2>
+            {% if expense.description %}
+            <p>{{ expense.description }}</p>
+            {% endif %}
+            <h2>Total Amount: {{ expense.total_amount }}</h2>
+            <h4>Split Method : {{ expense.split_method|capfirst }}</h4>
+
+            <table class="table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Amount Owed</th>
+                    <th>Percentage</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for participation in participations %}
+            <tr>
+                <td>{{ participation.user.name }}</td>
+                <td>{{ participation.user.email }}</td>
+                <td>{{ participation.amount_owed }}</td>
+                <td>{{ participation.percentage }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+            {% else %}
+            <p>Select an Expense to view details</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <button class="btn btn-lg btn-primary" style="position: fixed; bottom: 50px; right: 50px; z-index: 1030;"
+        data-bs-toggle="modal" data-bs-target="#NewExpense">
+        Create an Expense
+    </button>
+</div>
+
+<div class="modal fade" id="NewExpense" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-labelledby="NewExpenseLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="NewExpenseLabel">Create Expense</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="expense-form" method="post" class="container mt-4">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-sm-3">
+                            <h2>Create Expense</h2>
+                            <div class="mb-3">
+                                <label for="title" class="form-label">Expense Title</label>
+                                <input type="text" name="title" id="title" class="form-control" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="total_amount" class="form-label">Total Amount</label>
+                                <input type="number" name="total_amount" id="total_amount" class="form-control"
+                                    step="0.01" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="split_method" class="form-label">Split Method</label>
+                                <select name="split_method" id="split_method" class="form-control" required>
+                                    <option disabled selected value="">Select an option</option>
+                                    <option value="equal">Equal</option>
+                                    <option value="percentage">Percentage</option>
+                                    <option value="exact">Exact</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="description" class="form-label">Description (optional)</label>
+                                <input type="text" name="description" id="description" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-sm-9">
+                            <h3>Participants</h3>
+                            <div id="participant-forms">
+                                <!-- Initial participant form -->
+                                <div class="participant-form mb-3 border p-3 rounded row">
+                                    <h4>Participant 1</h4>
+
+                                    <div class="mb-3 col-md-3">
+                                        <label for="participant_1_name" class="form-label">Name</label>
+                                        <input type="text" name="participant_1_name" id="participant_1_name"
+                                            value="{{ username}}" class="form-control" required>
+                                    </div>
+
+                                    <div class="mb-3 col-md-3">
+                                        <label for="participant_1_email" class="form-label">Email</label>
+                                        <input type="email" name="participant_1_email" id="participant_1_email"
+                                            value="{{ email }}" class="form-control" required>
+                                    </div>
+
+                                    <div class="mb-3 col-md-3">
+                                        <label for="participant_1_amount_owed" class="form-label">Amount Owed</label>
+                                        <input type="number" name="participant_1_amount_owed"
+                                            id="participant_1_amount_owed" oninput="calculateSplit();"
+                                            class="form-control" step="0.01" required>
+                                    </div>
+
+                                    <div class="mb-3 col-md-3">
+                                        <label for="participant_1_percentage" class="form-label">Percentage</label>
+                                        <input type="number" name="participant_1_percentage"
+                                            id="participant_1_percentage" oninput="calculateSplit();"
+                                            class="form-control" step="0.01" required>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <!-- Button to add more participants -->
+                            <button type="button" id="add-participant" class="btn btn-secondary mt-3">Add
+                                Participant</button>
+                            <input type="hidden" id="num-participants" name="num_participants" value="1">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary mt-3">Create Expense</button>
+                </form>
+
+                <script>
+                    let percentageInputs = document.querySelectorAll('input[id$="_percentage"]');
+                    let amountOwedInputs = document.querySelectorAll('input[id$="_amount_owed"]');
+
+                    let participantCount = 1;
+                    const participantFormsDiv = document.getElementById('participant-forms');
+
+                    // Function to add a new participant form dynamically
+                    document.getElementById('add-participant').onclick = function () {
+                        addParticipantForm();
+                    };
+
+                    // Function to add participant form
+                    function addParticipantForm() {
+                        participantCount++;
+
+                        const newForm = document.createElement('div');
+                        newForm.className = 'participant-form mb-3 border p-3 rounded row';
+                        newForm.id = `participant_${participantCount}_form`;
+                        newForm.innerHTML = `
+                            <h4>Participant ${participantCount}</h4>
+                            <div class="mb-3 col-md-3">
+                                <label for="participant_${participantCount}_name" class="form-label">Name</label>
+                                <input type="text" name="participant_${participantCount}_name" id="participant_${participantCount}_name" class="form-control" required>
+                            </div>
+                            <div class="mb-3 col-md-3">
+                                <label for="participant_${participantCount}_email" class="form-label">Email</label>
+                                <input type="email" name="participant_${participantCount}_email" id="participant_${participantCount}_email" class="form-control" required>
+                            </div>
+                            <div class="mb-3 col-md-3">
+                                <label for="participant_${participantCount}_amount_owed" class="form-label">Amount Owed</label>
+                                <input type="number" name="participant_${participantCount}_amount_owed" id="participant_${participantCount}_amount_owed" oninput="calculateSplit();" class="form-control" step="0.01" required>
+                            </div>
+                            <div class="mb-3 col-md-3">
+                                <label for="participant_${participantCount}_percentage" class="form-label">Percentage</label>
+                                <input type="number" name="participant_${participantCount}_percentage" id="participant_${participantCount}_percentage" oninput="calculateSplit();" class="form-control" step="0.01" required>
+                            </div>
+                            <button type="button" class="btn btn-danger remove-participant" data-participant-id="participant_${participantCount}_form">Remove Participant</button>
+                        `;
+
+                        participantFormsDiv.appendChild(newForm);
+                        document.getElementById('num-participants').value = participantCount;
+
+                        // Attach event listener to the new delete button
+                        newForm.querySelector('.remove-participant').onclick = function () {
+                            removeParticipant(newForm.id);
+                        };
+
+                        calculateSplit();
+                    }
+
+                    function checkTotalPercentage() {
+                        let totalPercentage = 0;
+                        percentageInputs.forEach(input => {
+                            totalPercentage += parseFloat(input.value) || 0;
+                        });
+                        return totalPercentage === 100;
+                    }
+
+                    // Form onsubmit event handler
+                    document.querySelector('#expense-form').onsubmit = function (event) {
+                        const splitType = document.querySelector('#split_method').value;
+                        if ((splitType === 'percentage' || splitType === 'exact') && !checkTotalPercentage()) {
+                            alert('Total percentage must be 100.');
+                            event.preventDefault();
+                        }
+                    };
+
+                    function calculateSplit() {
+                        percentageInputs = document.querySelectorAll('input[id$="_percentage"]');
+                        amountOwedInputs = document.querySelectorAll('input[id$="_amount_owed"]');
+
+                        const totalAmount = parseFloat(document.getElementById('total_amount').value);
+                        const splitMethod = document.getElementById('split_method').value;
+
+                        if (!totalAmount || participantCount === 0) return;
+
+                        if (splitMethod === 'equal') {
+                            amountOwedInputs.forEach(input => {
+                                input.readOnly = true;
+                            });
+                            percentageInputs.forEach(input => {
+                                input.readOnly = true;
+                            });
+                            const amountPerParticipant = totalAmount / participantCount;
+                            const percentagePerParticipant = 100 / participantCount;
+
+                            for (let i = 1; i <= participantCount; i++) {
+                                document.getElementById(`participant_${i}_amount_owed`).value = amountPerParticipant.toFixed(2);
+                                document.getElementById(`participant_${i}_percentage`).value = percentagePerParticipant.toFixed(2);
+                            }
+                        }
+                        if (splitMethod === 'percentage') {
+                            amountOwedInputs.forEach(input => {
+                                input.readOnly = true;
+                            });
+                            percentageInputs.forEach(input => {
+                                input.readOnly = false;
+                            });
+                            const totalPercentage = 100;
+
+                            let totalPercentageAssigned = 0;
+
+                            for (let i = 1; i <= participantCount; i++) {
+                                const percentageInput = document.getElementById(`participant_${i}_percentage`);
+                                const percentage = parseFloat(percentageInput.value) || 0;
+                                totalPercentageAssigned += percentage;
+
+                                if (totalPercentageAssigned > 100) {
+                                    alert('Total percentage assigned exceeds 100');
+                                    percentageInput.value = (percentage - (totalPercentageAssigned - 100)).toFixed(2);
+                                    totalPercentageAssigned = 100;
+                                    calculateSplit();
+                                    break;
+                                }
+
+                                const amountOwed = (percentage / 100) * totalAmount;
+                                document.getElementById(`participant_${i}_amount_owed`).value = amountOwed.toFixed(2);
+                            }
+                        }
+                        if (splitMethod === 'exact') {
+                            amountOwedInputs.forEach(input => {
+                                input.readOnly = false;
+                            });
+                            percentageInputs.forEach(input => {
+                                input.readOnly = true;
+                            });
+                            // const totalPercentage = 100;
+
+                            let totalAmount = document.getElementById('total_amount').value;
+                            let totalAmountOwed = 0;
+                            for (let i = 1; i <= participantCount; i++) {
+                                const amount_owedInput = document.getElementById(`participant_${i}_amount_owed`);
+                                const amount_owed = parseFloat(amount_owedInput.value) || 0;
+                                totalAmountOwed += amount_owed;
+
+                                if (totalAmountOwed > totalAmount) {
+                                    alert('Total amount owed exceeds total amount');
+                                    amount_owedInput.value = (amount_owed - (totalAmountOwed - totalAmount)).toFixed(2);
+                                    totalAmountOwed = totalAmount;
+                                    calculateSplit();
+                                    break;
+                                }
+
+                                const percentamt = (amount_owed / totalAmount) * 100;
+                                document.getElementById(`participant_${i}_percentage`).value = percentamt.toFixed(2);
+                            }
+                        }
+                    }
+
+                    // Event listeners to trigger calculation when total amount or split method changes
+                    document.getElementById('total_amount').addEventListener('input', calculateSplit);
+                    document.getElementById('split_method').addEventListener('change', calculateSplit);
+
+                    // Function to remove a participant form
+                    function removeParticipant(participantId) {
+                        const participantForm = document.getElementById(participantId);
+                        participantForm.remove();
+                        participantCount--;
+                        document.getElementById('num-participants').value = participantCount;
+                        renumberParticipants();
+                        calculateSplit();
+                    }
+
+                    // Function to renumber participants
+                    function renumberParticipants() {
+                        const participantForms = document.querySelectorAll('.participant-form');
+                        let currentParticipant = 1;
+
+                        participantForms.forEach((form) => {
+                            form.id = `participant_${currentParticipant}_form`;
+
+                            // Update the heading
+                            const heading = form.querySelector('h4');
+                            if (heading) {
+                                heading.innerText = `Participant ${currentParticipant}`;
+                            }
+
+                            // Update Name Field
+                            const nameInput = form.querySelector('input[id$="_name"]');
+                            if (nameInput) {
+                                nameInput.id = `participant_${currentParticipant}_name`;
+                                nameInput.name = `participant_${currentParticipant}_name`;
+                            }
+
+                            // Update Email Field
+                            const emailInput = form.querySelector('input[id$="_email"]');
+                            if (emailInput) {
+                                emailInput.id = `participant_${currentParticipant}_email`;
+                                emailInput.name = `participant_${currentParticipant}_email`;
+                            }
+
+                            // Update Amount Owed Field
+                            const amountOwedInput = form.querySelector('input[id$="_amount_owed"]');
+                            if (amountOwedInput) {
+                                amountOwedInput.id = `participant_${currentParticipant}_amount_owed`;
+                                amountOwedInput.name = `participant_${currentParticipant}_amount_owed`;
+                            }
+
+                            // Update Percentage Field
+                            const percentageInput = form.querySelector('input[id$="_percentage"]');
+                            if (percentageInput) {
+                                percentageInput.id = `participant_${currentParticipant}_percentage`;
+                                percentageInput.name = `participant_${currentParticipant}_percentage`;
+                            }
+
+                            // Update the remove button data attribute
+                            const removeButton = form.querySelector('.remove-participant');
+                            if (removeButton) {
+                                removeButton.setAttribute('data-participant-id', `participant_${currentParticipant}_form`);
+                            }
+
+                            currentParticipant++;
+                        });
+                    }
+                </script>
+
+
+
+
+
+            </div>
+            <!-- <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" >Submit</button>
+            </div> -->
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+{% block scripts %}
+
+{% endblock %}

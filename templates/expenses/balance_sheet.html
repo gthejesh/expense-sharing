@@ -1,0 +1,41 @@
+{% extends 'expenses/ui.html' %}
+{% block title %}
+Balance Sheet
+{% endblock %}
+{% block content %}
+{% include 'inc/navbar.html' %}
+    <div class="container" style="margin-top: 100px;">
+        <div class="row">
+            <div class="col-md-12">
+                <h1>Balance Sheet</h1>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Total Paid</th>
+                            <th>Total Owed</th>
+                            <th>Balance</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for bs in balance_sheet %}
+                        <tr>
+                            <td>{{ bs.name }} - {{ bs.email }}</td>
+                            <td>{{ bs.amount_paid }}</td>
+                            <td>{{ bs.amount_owed }}</td>
+                            <td>{{ bs.balance }}</td>
+                            <td>{{ bs.description }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Action Button -->
+    <a href="{% url 'download_balance_sheet' %}" class="btn btn-primary btn-lg" style="position: fixed; bottom: 50px; right: 50px;">
+        Download Balance Sheet
+    </a>
+{% endblock %}
