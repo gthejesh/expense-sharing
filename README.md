@@ -8,7 +8,6 @@
 - [Usage](#usage)
 - [Generating Balance Sheet](#generating-balance-sheet)
 - [Downloading Balance Sheet as PDF](#downloading-balance-sheet-as-pdf)
-- [Contributing](#contributing)
 - [License](#license)
 
 ## Introduction
@@ -43,11 +42,51 @@ To set up the project on your local machine, follow these steps:
    ```bash
     pip install -r requirements.txt
 
-4. **Create a MySQL database named expense_sharing and turn the server on. 
+4. **Create and connect to database**
+Create a MySQL database named expense_sharing and turn the server on. You can configure the database in settings.py. 
 
-Run the following commad to migrate the Database to your server**
+    ```sh
+    DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'expense_sharing', 
+        'USER': 'root', 
+        'PASSWORD': '', 
+        'HOST': 'localhost',
+        'PORT': '3306',
+        }
+    }
+    ```
+Run the following command to migrate the Database to your server
+
     ```bash
     python manage.py migrate
+    ```
+5. **Create a superuser (optional, for admin access)**
 
-5. ****
+    ```bash
+    python manage.py createsuperuser
+    ```
 
+6. **Run the development server**
+
+```bash
+python manage.py runserver
+```
+
+## Usage
+- [ ]Navigate to http://127.0.0.1:8000/ in your web browser.
+- [ ]Register or log in to access the application.
+- [ ]Create and manage your expenses through the user interface.
+
+## Generating Balance Sheet
+- [ ]After adding atleast one expense, navigate to the "Balance Sheet" section to view your contributions and dues.
+- [ ]The balance sheet will display the amount paid, amount owed, balance, and descriptions for each user.
+
+## Downloading Balance Sheet as PDF
+- [ ]In the "Balance Sheet" section, you will find a button to download the balance sheet.
+- [ ]Clicking the button will generate a CSV document containing the balance sheet details.
+
+## License
+
+Distributed under the MIT License. See `LICENSE.txt` for more information.
