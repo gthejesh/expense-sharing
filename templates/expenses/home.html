@@ -54,7 +54,8 @@ Dashboard
                     <p class="text-muted">{{ expense.description }}</p>
                     {% endif %}
                     <h2 class="h4">Total Amount: <span class="text-success">{{ expense.total_amount }}</span></h2>
-                    <h4 class="h5">Split Method: <span class="badge bg-primary">{{ expense.split_method|capfirst }}</span></h4>
+                    <h4 class="h5">Split Method: <span class="badge bg-primary">{{ expense.split_method|capfirst
+                            }}</span></h4>
                 </div>
 
                 <div class="table-responsive">
@@ -115,8 +116,8 @@ Dashboard
 
                             <div class="mb-3">
                                 <label for="total_amount" class="form-label">Total Amount</label>
-                                <input type="number" name="total_amount" id="total_amount" class="form-control"
-                                    step="0.01" required>
+                                <input type="number" name="total_amount" id="total_amount" oninput="calculateSplit();"
+                                    class="form-control" step="0.01" required>
                             </div>
 
                             <div class="mb-3">
@@ -139,7 +140,7 @@ Dashboard
                             <div id="participant-forms">
                                 <!-- Initial participant form -->
                                 <div class="participant-form mb-3 border p-3 rounded row">
-                                    <h4>Participant 1</h4>
+                                    <h4>Participant 1 - Myself</h4>
 
                                     <div class="mb-3 col-md-3">
                                         <label for="participant_1_name" class="form-label">Name</label>
@@ -185,6 +186,7 @@ Dashboard
                     let participantCount = 1;
                     const participantFormsDiv = document.getElementById('participant-forms');
 
+                    // Add new participant form
                     document.getElementById('add-participant').onclick = function () {
                         addParticipantForm();
                     };
@@ -196,7 +198,12 @@ Dashboard
                         newForm.className = 'participant-form mb-3 border p-3 rounded row';
                         newForm.id = `participant_${participantCount}_form`;
                         newForm.innerHTML = `
-                            <h4>Participant ${participantCount}</h4>
+                            <div class="position-relative">
+                                <h4>Participant ${participantCount}</h4>
+                                <button type="button" class="btn position-absolute top-0 end-0 remove-participant" aria-label="Remove" data-participant-id="participant_${participantCount}_form">
+        <i class="bi bi-trash"></i>
+    </button>
+                                </div>
                             <div class="mb-3 col-md-3">
                                 <label for="participant_${participantCount}_name" class="form-label">Name</label>
                                 <input type="text" name="participant_${participantCount}_name" id="participant_${participantCount}_name" class="form-control" required>
@@ -213,12 +220,13 @@ Dashboard
                                 <label for="participant_${participantCount}_percentage" class="form-label">Percentage</label>
                                 <input type="number" name="participant_${participantCount}_percentage" id="participant_${participantCount}_percentage" oninput="calculateSplit();" class="form-control" step="0.01" required>
                             </div>
-                            <button type="button" class="btn btn-danger remove-participant" data-participant-id="participant_${participantCount}_form">Remove Participant</button>
+
                         `;
 
                         participantFormsDiv.appendChild(newForm);
                         document.getElementById('num-participants').value = participantCount;
 
+                        // Remove participant form
                         newForm.querySelector('.remove-participant').onclick = function () {
                             removeParticipant(newForm.id);
                         };
@@ -226,6 +234,7 @@ Dashboard
                         calculateSplit();
                     }
 
+                    // Check if total percentage is 100
                     function checkTotalPercentage() {
                         let totalPercentage = 0;
                         percentageInputs.forEach(input => {
@@ -233,6 +242,8 @@ Dashboard
                         });
                         return totalPercentage === 100;
                     }
+
+                    // Form submission validation
                     document.querySelector('#expense-form').onsubmit = function (event) {
                         const splitType = document.querySelector('#split_method').value;
                         if ((splitType === 'percentage' || splitType === 'exact') && !checkTotalPercentage()) {
@@ -241,6 +252,7 @@ Dashboard
                         }
                     };
 
+                    // Calculate split based on method
                     function calculateSplit() {
                         percentageInputs = document.querySelectorAll('input[id$="_percentage"]');
                         amountOwedInputs = document.querySelectorAll('input[id$="_amount_owed"]');
@@ -300,7 +312,6 @@ Dashboard
                             percentageInputs.forEach(input => {
                                 input.readOnly = true;
                             });
-                            // const totalPercentage = 100;
 
                             let totalAmount = document.getElementById('total_amount').value;
                             let totalAmountOwed = 0;
@@ -326,6 +337,7 @@ Dashboard
                     document.getElementById('total_amount').addEventListener('input', calculateSplit);
                     document.getElementById('split_method').addEventListener('change', calculateSplit);
 
+                    // Remove participant form
                     function removeParticipant(participantId) {
                         const participantForm = document.getElementById(participantId);
                         participantForm.remove();
@@ -335,6 +347,7 @@ Dashboard
                         calculateSplit();
                     }
 
+                    // Renumber participants after removal
                     function renumberParticipants() {
                         const participantForms = document.querySelectorAll('.participant-form');
                         let currentParticipant = 1;
@@ -380,16 +393,7 @@ Dashboard
                         });
                     }
                 </script>
-
-
-
-
-
             </div>
-            <!-- <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" >Submit</button>
-            </div> -->
         </div>
     </div>
 </div>

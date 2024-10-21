@@ -114,7 +114,7 @@ def balance_sheet(request):
         bs['amount_paid'] = amount_paid[user.id]
         bs['amount_owed'] = amount_owed[user.id]
         bs['balance'] = amount_paid[user.id] - amount_owed[user.id]
-        bs['description'] = 'Should pay ' + str(abs(bs['balance'])) if bs['balance'] < 0 else 'Can get back ₹' + str(abs(bs['balance']))
+        bs['description'] = 'Should pay ₹' + str(abs(bs['balance'])) if bs['balance'] < 0 else 'Can get back ₹' + str(abs(bs['balance']))
         balance_sheet.append(bs)
 
     content = {
@@ -174,7 +174,7 @@ def download_balance_sheet(request):
 
     
     for entry in balance_sheet:
-        description = 'Should pay ' + str(abs(entry['balance'])) if entry['balance'] < 0 else 'Can get back ₹' + str(abs(entry['balance']))
+        description = 'Should pay Rs. ' + str(abs(entry['balance'])) if entry['balance'] < 0 else 'Can get back Rs. ' + str(abs(entry['balance']))
         writer.writerow([entry['name'], entry['email'], entry['amount_paid'], entry['amount_owed'], entry['balance'], description])
 
     return response
