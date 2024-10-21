@@ -70,9 +70,9 @@ Run the following command to migrate the Database to your server
 
 6. **Run the development server**
 
-```bash
-python manage.py runserver
-```
+    ```bash
+    python manage.py runserver
+    ```
 
 ## Usage
 - Navigate to http://127.0.0.1:8000/ in your web browser.
