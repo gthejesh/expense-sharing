@@ -57,18 +57,18 @@ Create a MySQL database named expense_sharing and turn the server on. You can co
         }
     }
     ```
-Run the following command to migrate the Database to your server
+5. **Run the following command to migrate the Database to your server**
 
     ```bash
     python manage.py migrate
     ```
-5. **Create a superuser (optional, for admin access)**
+6. **Create a superuser (optional, for admin access)**
 
     ```bash
     python manage.py createsuperuser
     ```
 
-6. **Run the development server**
+7. **Run the development server**
 
     ```bash
     python manage.py runserver
