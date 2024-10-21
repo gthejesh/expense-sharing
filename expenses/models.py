@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.hashers import make_password, check_password
 
+# User model to store user details
 class User(models.Model):
     email = models.EmailField(unique=True)
     name = models.CharField(max_length=255)
@@ -8,13 +9,16 @@ class User(models.Model):
     password = models.CharField(max_length=255, null=True, blank=True)
     added_by = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True)
 
+    # Set hashed password
     def set_password(self, raw_password):
         self.password = make_password(raw_password)
         self.save()
     
+    # Check hashed password
     def check_password(self, raw_password):
         return check_password(raw_password, self.password)
 
+# Expenses model to store expense details
 class Expenses(models.Model):
     SPLIT_METHODS = [
         ('equal', 'Equal'),
@@ -32,8 +36,8 @@ class Expenses(models.Model):
     def __str__(self):
         return self.description
 
+# Participant model to store participant details in an expense
 class Participant(models.Model):
-    
     expense = models.ForeignKey(Expenses, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     amount_owed = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
