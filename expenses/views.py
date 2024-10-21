@@ -9,13 +9,13 @@ from django.http import HttpResponse
 
 def home(request, expenses_details=None):
     if request.method == 'POST':
-        # Retrieve the expense details
+        
         title = request.POST['title']
         total_amount = request.POST['total_amount']
         split_method = request.POST['split_method']
         description = request.POST.get('description', '')
 
-        # Create the expense entry
+        
         expense = Expenses.objects.create(
             title=title,
             total_amount=total_amount,
@@ -24,24 +24,24 @@ def home(request, expenses_details=None):
             created_by=User.objects.get(id=request.session['user_id'])
         )
 
-        # Get number of participants
+        
         num_participants = int(request.POST['num_participants'])
 
-        # Iterate through participants
+        
         for i in range(1,num_participants+1):
             participant_name = request.POST[f'participant_{i}_name']
             participant_email = request.POST[f'participant_{i}_email']
             amount_owed = request.POST.get(f'participant_{i}_amount_owed', 0)
             percentage = request.POST.get(f'participant_{i}_percentage', 0)
 
-            # Check if the user exists based on email
+            
             try:
                 user = User.objects.get(email=participant_email)
             except User.DoesNotExist:
-                # Create a new user if one doesn't exist
+                
                 user = User.objects.create(email=participant_email, name=participant_name, added_by=User.objects.get(id=request.session['user_id']))
                 user.save()
-            # Create a participant entry
+            
             Participant.objects.create(
                 expense=expense,
                 user=user,
@@ -55,7 +55,7 @@ def home(request, expenses_details=None):
     
     myparticipations = Participant.objects.filter(user=User.objects.get(id=request.session['user_id']))
     user = User.objects.get(id=request.session['user_id'])
-    # expenses = Expenses.objects.filter(created_by=user)
+    
     content = {'username': user.name, 'email': user.email, 'myparticipations': myparticipations}
     if expenses_details:
         participations = Participant.objects.filter(expense=expenses_details)
@@ -90,10 +90,8 @@ def balance_sheet(request):
             amount_owed[participation.user.id] += participation.amount_owed
         amount_paid[expense.created_by.id] += expense.total_amount
 
-    # Convert set to list
     user_list = list(users)
 
-    # Prepare the balance sheet
     balance_sheet = []
     for user in user_list:
         bs = {}
@@ -110,8 +108,6 @@ def balance_sheet(request):
     }
     
     return render(request, 'expenses/balance_sheet.html', content)
-
-
 
 def download_balance_sheet(request):
     if not 'user_id' in request.session:
@@ -140,7 +136,6 @@ def download_balance_sheet(request):
 
     user_list = list(users)
 
-    # Prepare the balance sheet for CSV
     balance_sheet = []
     for user in user_list:
         bs = {}
@@ -151,17 +146,17 @@ def download_balance_sheet(request):
         bs['balance'] = amount_paid[user.id] - amount_owed[user.id]
         balance_sheet.append(bs)
 
-    # Create a CSV response
+    
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="balance_sheet.csv"'
 
     writer = csv.writer(response)
-    # Write the header row
+    
     writer.writerow(['Name', 'Email', 'Amount Paid', 'Amount Owed', 'Balance', 'Description'])
 
-    # Write data rows
+    
     for entry in balance_sheet:
-        description = 'Should pay ₹' + str(abs(entry['balance'])) if entry['balance'] < 0 else 'Can get back ₹' + str(abs(entry['balance']))
+        description = 'Should pay ' + str(abs(entry['balance'])) if entry['balance'] < 0 else 'Can get back ₹' + str(abs(entry['balance']))
         writer.writerow([entry['name'], entry['email'], entry['amount_paid'], entry['amount_owed'], entry['balance'], description])
 
     return response

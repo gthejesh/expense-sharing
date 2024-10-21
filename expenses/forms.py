@@ -26,6 +26,6 @@ class ExpenseForm(forms.Form):
     description = forms.CharField(max_length=255, required=False)
 
 class ParticipantForm(forms.Form):
-    user = forms.CharField(max_length=255)  # Assuming you want to enter user email or username
+    user = forms.CharField(max_length=255)  
     amount_owed = forms.DecimalField(max_digits=10, decimal_places=2, required=False)
     percentage = forms.DecimalField(max_digits=5, decimal_places=2, required=False)

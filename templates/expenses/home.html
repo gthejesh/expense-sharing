@@ -162,7 +162,6 @@ Dashboard
 
                             </div>
 
-                            <!-- Button to add more participants -->
                             <button type="button" id="add-participant" class="btn btn-secondary mt-3">Add
                                 Participant</button>
                             <input type="hidden" id="num-participants" name="num_participants" value="1">
@@ -178,12 +177,10 @@ Dashboard
                     let participantCount = 1;
                     const participantFormsDiv = document.getElementById('participant-forms');
 
-                    // Function to add a new participant form dynamically
                     document.getElementById('add-participant').onclick = function () {
                         addParticipantForm();
                     };
 
-                    // Function to add participant form
                     function addParticipantForm() {
                         participantCount++;
 
@@ -214,7 +211,6 @@ Dashboard
                         participantFormsDiv.appendChild(newForm);
                         document.getElementById('num-participants').value = participantCount;
 
-                        // Attach event listener to the new delete button
                         newForm.querySelector('.remove-participant').onclick = function () {
                             removeParticipant(newForm.id);
                         };
@@ -229,8 +225,6 @@ Dashboard
                         });
                         return totalPercentage === 100;
                     }
-
-                    // Form onsubmit event handler
                     document.querySelector('#expense-form').onsubmit = function (event) {
                         const splitType = document.querySelector('#split_method').value;
                         if ((splitType === 'percentage' || splitType === 'exact') && !checkTotalPercentage()) {
@@ -321,11 +315,9 @@ Dashboard
                         }
                     }
 
-                    // Event listeners to trigger calculation when total amount or split method changes
                     document.getElementById('total_amount').addEventListener('input', calculateSplit);
                     document.getElementById('split_method').addEventListener('change', calculateSplit);
 
-                    // Function to remove a participant form
                     function removeParticipant(participantId) {
                         const participantForm = document.getElementById(participantId);
                         participantForm.remove();
@@ -335,7 +327,6 @@ Dashboard
                         calculateSplit();
                     }
 
-                    // Function to renumber participants
                     function renumberParticipants() {
                         const participantForms = document.querySelectorAll('.participant-form');
                         let currentParticipant = 1;
@@ -343,41 +334,35 @@ Dashboard
                         participantForms.forEach((form) => {
                             form.id = `participant_${currentParticipant}_form`;
 
-                            // Update the heading
                             const heading = form.querySelector('h4');
                             if (heading) {
                                 heading.innerText = `Participant ${currentParticipant}`;
                             }
 
-                            // Update Name Field
                             const nameInput = form.querySelector('input[id$="_name"]');
                             if (nameInput) {
                                 nameInput.id = `participant_${currentParticipant}_name`;
                                 nameInput.name = `participant_${currentParticipant}_name`;
                             }
 
-                            // Update Email Field
                             const emailInput = form.querySelector('input[id$="_email"]');
                             if (emailInput) {
                                 emailInput.id = `participant_${currentParticipant}_email`;
                                 emailInput.name = `participant_${currentParticipant}_email`;
                             }
 
-                            // Update Amount Owed Field
                             const amountOwedInput = form.querySelector('input[id$="_amount_owed"]');
                             if (amountOwedInput) {
                                 amountOwedInput.id = `participant_${currentParticipant}_amount_owed`;
                                 amountOwedInput.name = `participant_${currentParticipant}_amount_owed`;
                             }
 
-                            // Update Percentage Field
                             const percentageInput = form.querySelector('input[id$="_percentage"]');
                             if (percentageInput) {
                                 percentageInput.id = `participant_${currentParticipant}_percentage`;
                                 percentageInput.name = `participant_${currentParticipant}_percentage`;
                             }
 
-                            // Update the remove button data attribute
                             const removeButton = form.querySelector('.remove-participant');
                             if (removeButton) {
                                 removeButton.setAttribute('data-participant-id', `participant_${currentParticipant}_form`);
