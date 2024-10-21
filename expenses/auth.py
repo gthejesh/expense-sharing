@@ -39,7 +39,7 @@ def register(request):
                 messages.error(request, 'User already exists.')
                 return redirect('register')
     else:
-        # GET request
+        # GET request 
         form = RegistrationForm()
 
     return render(request, 'expenses/register.html', {'form': form})
