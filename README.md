@@ -75,17 +75,17 @@ python manage.py runserver
 ```
 
 ## Usage
-- [ ]Navigate to http://127.0.0.1:8000/ in your web browser.
-- [ ]Register or log in to access the application.
-- [ ]Create and manage your expenses through the user interface.
+- Navigate to http://127.0.0.1:8000/ in your web browser.
+- Register or log in to access the application.
+- Create and manage your expenses through the user interface.
 
 ## Generating Balance Sheet
-- [ ]After adding atleast one expense, navigate to the "Balance Sheet" section to view your contributions and dues.
-- [ ]The balance sheet will display the amount paid, amount owed, balance, and descriptions for each user.
+- After adding atleast one expense, navigate to the "Balance Sheet" section to view your contributions and dues.
+- The balance sheet will display the amount paid, amount owed, balance, and descriptions for each user.
 
 ## Downloading Balance Sheet as PDF
-- [ ]In the "Balance Sheet" section, you will find a button to download the balance sheet.
-- [ ]Clicking the button will generate a CSV document containing the balance sheet details.
+- In the "Balance Sheet" section, you will find a button to download the balance sheet.
+- Clicking the button will generate a CSV document containing the balance sheet details.
 
 ## License
 
