@@ -28,9 +28,9 @@ Dashboard
                     {% for mp in myparticipations %}
                     <tr>
                         <td>{{ mp.expense.title }}</td>
-                        <td>{{ mp.amount_owed  }}/{{ mp.expense.total_amount }}</td>
+                        <td>{{ mp.amount_owed }}/{{ mp.expense.total_amount }}</td>
                         <td>{{ mp.expense.created_at|date:"d-m-Y" }}</td>
-                        {% if  mp.expense.created_by.id == request.session.user_id %}
+                        {% if mp.expense.created_by.id == request.session.user_id %}
                         <td>me</td>
                         {% else %}
                         <td>{{ mp.expense.created_by.name }}</td>
@@ -45,38 +45,46 @@ Dashboard
             {% endif %}
         </div>
         <div class="col-md-6 border-start ps-5">
-            <h1>Expense Details</h1>
-            {% if participations %}
-            <h2>{{ expense.title }}</h2>
-            {% if expense.description %}
-            <p>{{ expense.description }}</p>
-            {% endif %}
-            <h2>Total Amount: {{ expense.total_amount }}</h2>
-            <h4>Split Method : {{ expense.split_method|capfirst }}</h4>
+            <div class="expense-details">
+                <h1 class="mb-3">Expense Details</h1>
+                {% if participations %}
+                <div class="expense-summary mb-4">
+                    <h2 class="h3">{{ expense.title }}</h2>
+                    {% if expense.description %}
+                    <p class="text-muted">{{ expense.description }}</p>
+                    {% endif %}
+                    <h2 class="h4">Total Amount: <span class="text-success">{{ expense.total_amount }}</span></h2>
+                    <h4 class="h5">Split Method: <span class="badge bg-primary">{{ expense.split_method|capfirst }}</span></h4>
+                </div>
 
-            <table class="table">
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Amount Owed</th>
-                    <th>Percentage</th>
-                </tr>
-            </thead>
-            <tbody>
-            {% for participation in participations %}
-            <tr>
-                <td>{{ participation.user.name }}</td>
-                <td>{{ participation.user.email }}</td>
-                <td>{{ participation.amount_owed }}</td>
-                <td>{{ participation.percentage }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-            {% else %}
-            <p>Select an Expense to view details</p>
-            {% endif %}
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Amount Owed</th>
+                                <th>Percentage</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for participation in participations %}
+                            <tr>
+                                <td>{{ participation.user.name }}</td>
+                                <td>{{ participation.user.email }}</td>
+                                <td>{{ participation.amount_owed }}</td>
+                                <td>{{ participation.percentage }}%</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="alert alert-warning" role="alert">
+                    <p class="mb-0">Select an Expense to view details</p>
+                </div>
+                {% endif %}
+            </div>
         </div>
     </div>
 
