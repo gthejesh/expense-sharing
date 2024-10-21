@@ -54,8 +54,7 @@ Dashboard
                     <p class="text-muted">{{ expense.description }}</p>
                     {% endif %}
                     <h2 class="h4">Total Amount: <span class="text-success">{{ expense.total_amount }}</span></h2>
-                    <h4 class="h5">Split Method: <span class="badge bg-primary">{{ expense.split_method|capfirst
-                            }}</span></h4>
+                    <h4 class="h5">Split Method: <span class="badge bg-primary">{{ expense.split_method|capfirst }}</span></h4>
                 </div>
 
                 <div class="table-responsive">
@@ -201,8 +200,8 @@ Dashboard
                             <div class="position-relative">
                                 <h4>Participant ${participantCount}</h4>
                                 <button type="button" class="btn position-absolute top-0 end-0 remove-participant" aria-label="Remove" data-participant-id="participant_${participantCount}_form">
-        <i class="bi bi-trash"></i>
-    </button>
+                                    <i class="bi bi-trash"></i>
+                                </button>
                                 </div>
                             <div class="mb-3 col-md-3">
                                 <label for="participant_${participantCount}_name" class="form-label">Name</label>
@@ -240,7 +239,8 @@ Dashboard
                         percentageInputs.forEach(input => {
                             totalPercentage += parseFloat(input.value) || 0;
                         });
-                        return totalPercentage === 100;
+                        //sometimes the total percentage add up to 99.9 only
+                        return totalPercentage > 99.9 && totalPercentage <= 100.1;
                     }
 
                     // Form submission validation
